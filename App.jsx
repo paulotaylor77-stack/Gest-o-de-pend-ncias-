@@ -1,0 +1,1376 @@
+import React, { useState, useMemo } from "react";
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, PieChart, Pie, Cell,
+  LineChart, Line, Legend, ResponsiveContainer,
+} from "recharts";
+import {
+  Plus, X, Upload, ClipboardList, BarChart3, ChevronRight, Trash2,
+  CheckCircle2, RotateCcw, Package, ArrowLeft, Filter, User, Users,
+  ShieldCheck, LogOut,
+} from "lucide-react";
+
+const LOGO_URL = "data:image/png;base64,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";
+
+
+// ---------------------------------------------------------------------------
+// Design tokens (matching the plan document's visual identity)
+// ---------------------------------------------------------------------------
+const NAVY = "#3F4A12";  // dark olive, matches the logo background
+const ACCENT = "#748C00";  // olive-lime green, matches the logo mark
+const BG = "#F4F5F7";
+const BORDER = "#DADFE6";
+const TEXT = "#2B2E33";
+const MUTED = "#6B7280";
+
+const PRIORITY = {
+  A: { label: "Alta", bg: "#FBE2E2", fg: "#96282A", ring: "#C0504D" },
+  B: { label: "Média", bg: "#FDEBD3", fg: "#8A5A00", ring: "#E0A526" },
+  C: { label: "Baixa", bg: "#E1EFE2", fg: "#2E6B33", ring: "#548235" },
+};
+
+const STATUS = {
+  aguardando_conferencia: { label: "Aguardando conferência", bg: "#FDEBD3", fg: "#8A5A00" },
+  aguardando_analise: { label: "Aguardando análise final", bg: "#DCE6F7", fg: "#28508C" },
+  necessita_nova_conferencia: { label: "Necessita nova conferência", bg: "#F8D6D6", fg: "#96282A" },
+  concluida: { label: "Concluída", bg: "#DCEEDD", fg: "#2E6E2E" },
+};
+
+const SITUACOES = [
+  "Material encontrado no endereço correto",
+  "Material encontrado em outro endereço",
+  "Material encontrado parcialmente",
+  "Material não localizado",
+  "Material diferente do esperado",
+  "Quantidade física diferente da quantidade do sistema",
+  "Material sem identificação",
+  "Outra situação",
+];
+
+const RESULTADOS = [
+  "Divergência Confirmada",
+  "Divergência Não Confirmada",
+  "Divergência Confirmada Parcialmente",
+  "Necessita Nova Conferência",
+];
+
+const SETORES = [
+  "Recebimento", "Expedição/Separação", "Produção", "Movimentação Interna",
+  "Qualidade", "Sistema/Cadastro", "Compras", "Não Identificado", "Outro",
+];
+
+const CAUSAS = [
+  "Erro de Lançamento no Sistema", "Erro de Endereçamento", "Falha de Processo",
+  "Extravio", "Avaria", "Erro de Contagem", "Duplicidade de Cadastro", "Outro",
+];
+
+const TRATATIVAS = [
+  "Ajuste de Estoque no Sistema", "Reabertura para Nova Contagem",
+  "Encaminhado à Segurança Patrimonial", "Treinamento de Equipe",
+  "Revisão de Processo", "Nenhuma Ação Necessária",
+];
+
+// The app now opens on a splash screen with a single icon button. Tapping it
+// reveals this menu of top-level destinations. "analise" (Análise Final) is
+// intentionally left out: it's never a top-level destination, it's only
+// reachable via the "Acessar" button on a pendência that has already left
+// the conferência stage (see TelaPendencias).
+const MENU_ITEMS = [
+  { key: "cadastro", label: "Criar Pendência", desc: "Cadastrar uma nova divergência de inventário", icon: Plus },
+  { key: "pendencias", label: "Ver Pendências", desc: "Acompanhar, filtrar e conferir pendências", icon: ClipboardList },
+  { key: "indicadores", label: "Indicadores", desc: "Painéis e gráficos do inventário", icon: BarChart3 },
+];
+
+// ---------------------------------------------------------------------------
+// Perfis de acesso
+// ---------------------------------------------------------------------------
+// Analista e Gestor têm acesso total. Conferente só acessa a aba de
+// Pendências — sem poder criar pendências (aba "cadastro") e sem ver
+// Indicadores. "analise" (Análise Final) também fica fora do alcance do
+// Conferente, pois é uma continuação do fluxo do Analista/Gestor.
+const PERFIS = {
+  analista: { label: "Analista", tabs: ["cadastro", "pendencias", "analise", "indicadores"] },
+  conferente: { label: "Conferente", tabs: ["pendencias"] },
+  gestor: { label: "Gestor", tabs: ["cadastro", "pendencias", "analise", "indicadores"] },
+};
+function podeAcessar(perfil, tab) {
+  if (tab === "splash" || tab === "menu") return true;
+  return PERFIS[perfil]?.tabs.includes(tab) ?? false;
+}
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+let seq = 500;
+function nextId() {
+  seq += 1;
+  return `PND-0${seq}`;
+}
+function fmtDate(d) {
+  if (!d) return "—";
+  return new Date(d).toLocaleDateString("pt-BR");
+}
+function fmtMoney(v) {
+  const n = Number(v) || 0;
+  return n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
+function daysBetween(a, b) {
+  if (!a || !b) return null;
+  const ms = new Date(b) - new Date(a);
+  return Math.max(0, Math.round(ms / 86400000));
+}
+function readImage(file, cb) {
+  const reader = new FileReader();
+  reader.onload = (e) => cb({ dataUrl: e.target.result, name: file.name });
+  reader.readAsDataURL(file);
+}
+
+// ---------------------------------------------------------------------------
+// Leitura automática do relatório de histórico (foto/print do SAP)
+// ---------------------------------------------------------------------------
+// A tabela sempre tem o formato:
+//   Texto breve | Tp. | Ár. | Pos.origem | Ár. | Tp. | PosiçDest | QtdTeor D | UMA | SC
+// Precisamos apenas da 1ª posição (Pos.origem, o 1º código de endereço/documento
+// da linha) e da QtdTeor D (o número decimal logo antes de "UND"/"UN").
+const RE_CODIGO = /\b(?:[A-Z]\d{2}-\d{2}-\d{2}|\d{7,10})\b/g;
+const RE_QTD = /(\d{1,3}(?:\.\d{3})*,\d{3})\s*(?:UND?\b)/i;
+
+function parseLinhaHistorico(linha) {
+  const codigos = linha.match(RE_CODIGO);
+  const qtdMatch = linha.match(RE_QTD);
+  if (!codigos || !codigos.length || !qtdMatch) return null;
+  const quantidade = Number(qtdMatch[1].replace(/\./g, "").replace(",", "."));
+  if (!Number.isFinite(quantidade)) return null;
+  return { endereco: codigos[0], quantidadeSistema: quantidade };
+}
+
+// Recebe o texto bruto do OCR e devolve as linhas já no formato usado pelo app.
+// É um processo de "melhor esforço": fotos de tabela raramente ficam 100% certas
+// no OCR, por isso o resultado sempre deve ser revisado pelo analista antes de salvar.
+function parseHistoricoTexto(texto) {
+  const linhas = texto.split("\n").map((l) => l.trim()).filter(Boolean);
+  const linhasEncontradas = linhas.map(parseLinhaHistorico).filter(Boolean);
+  return linhasEncontradas.map((l) => ({
+    id: Math.random().toString(36).slice(2),
+    endereco: l.endereco,
+    quantidadeSistema: l.quantidadeSistema,
+    quantidadeEncontrada: "",
+    origemImagem: true,
+  }));
+}
+
+// Tesseract.js não está na lista de bibliotecas com "import" suportadas pelo
+// preview de artifacts, então carregamos via <script> (CDN), como qualquer
+// outra lib externa. Depois disso, `window.Tesseract` fica disponível.
+let tesseractLoadPromise = null;
+function carregarTesseract() {
+  if (window.Tesseract) return Promise.resolve(window.Tesseract);
+  if (tesseractLoadPromise) return tesseractLoadPromise;
+  tesseractLoadPromise = new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = "https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.1.1/tesseract.min.js";
+    script.async = true;
+    script.onload = () => resolve(window.Tesseract);
+    script.onerror = () => reject(new Error("Não foi possível carregar a biblioteca de leitura de imagem."));
+    document.head.appendChild(script);
+  });
+  return tesseractLoadPromise;
+}
+
+// Roda o OCR (Tesseract.js) sobre a imagem e devolve as linhas já parseadas.
+async function extrairHistoricoDaImagem(dataUrl) {
+  const Tesseract = await carregarTesseract();
+  const worker = await Tesseract.createWorker("por");
+  try {
+    const { data } = await worker.recognize(dataUrl);
+    return parseHistoricoTexto(data.text || "");
+  } finally {
+    await worker.terminate();
+  }
+}
+
+// A pendência only belongs on the Análise Final screen once it has left the
+// conferente's hands. While it's aguardando_conferencia or back with the
+// conferente (necessita_nova_conferencia), "Acessar" should open it on the
+// Pendências screen instead.
+function precisaAnaliseFinal(status) {
+  return status === "aguardando_analise" || status === "concluida";
+}
+
+// ---------------------------------------------------------------------------
+// Seed data — demo pendências across each stage of the flow
+// ---------------------------------------------------------------------------
+function seedData() {
+  const base = [
+    {
+      id: "PND-0512", prioridade: "A", dataAbertura: "2026-09-08", analista: "J. Souza",
+      codigoMaterial: "MAT-004521", descricaoMaterial: "Rolamento esférico 6205-2RS",
+      familiaGrupo: "Peças de Reposição — Rolamentos", unidadeMedida: "UN",
+      almoxarifado: "ALM-02 — Manutenção", enderecoSistema: "A-02-15",
+      imagemEndereco: null, quantidadeSistema: 100, quantidadeInventario: 95,
+      valorUnitario: 42, ultimaMovTipo: "Transferência", ultimaMovData: "2026-09-03",
+      quantidadeMovimentada: 10, ultimoEnderecoConhecido: "B-04-03", imagemHistorico: null,
+      observacoesAnalista: "Verificar também o endereço B-04-03, pois houve transferência recente não confirmada no sistema. Endereço A-02-15 possui mais de uma casa.",
+      status: "aguardando_conferencia",
+      situacaoEncontrada: "", casasEnderecos: [], observacoesConferente: "", evidenciaFotografica: null,
+      resultadoInvestigacao: "", setorCausador: "", causaRaiz: "", tratativaAplicada: "",
+      valorFinalDivergencia: "", parecerFinal: "", dataConclusao: null,
+    },
+    {
+      id: "PND-0487", prioridade: "A", dataAbertura: "2026-09-05", analista: "J. Souza",
+      codigoMaterial: "MAT-004521", descricaoMaterial: "Filtro de óleo hidráulico",
+      familiaGrupo: "Peças de Reposição — Filtros", unidadeMedida: "UN",
+      almoxarifado: "ALM-02 — Manutenção", enderecoSistema: "A-05-02",
+      imagemEndereco: null, quantidadeSistema: 40, quantidadeInventario: 43,
+      valorUnitario: 58, ultimaMovTipo: "Recebimento", ultimaMovData: "2026-08-29",
+      quantidadeMovimentada: 20, ultimoEnderecoConhecido: "A-05-02", imagemHistorico: null,
+      observacoesAnalista: "Verificar se houve troca de endereço com o item MAT-004498.",
+      status: "aguardando_analise",
+      situacaoEncontrada: "Material encontrado em outro endereço",
+      casasEnderecos: [
+        { id: "c1", endereco: "A-05-02", quantidadeSistema: 25, quantidadeEncontrada: 25, origemImagem: true },
+        { id: "c2", endereco: "A-05-02", quantidadeSistema: 15, quantidadeEncontrada: 18, origemImagem: true },
+      ],
+      observacoesConferente: "Encontrado dividido em duas casas do mesmo endereço.",
+      evidenciaFotografica: null,
+      resultadoInvestigacao: "", setorCausador: "", causaRaiz: "", tratativaAplicada: "",
+      valorFinalDivergencia: "", parecerFinal: "", dataConclusao: null,
+    },
+    {
+      id: "PND-0470", prioridade: "B", dataAbertura: "2026-08-30", analista: "R. Alves",
+      codigoMaterial: "MAT-002210", descricaoMaterial: "Mangueira hidráulica 3/4",
+      familiaGrupo: "Peças de Reposição — Hidráulica", unidadeMedida: "UN",
+      almoxarifado: "ALM-01 — Produção", enderecoSistema: "D-02-01",
+      imagemEndereco: null, quantidadeSistema: 20, quantidadeInventario: 19,
+      valorUnitario: 76, ultimaMovTipo: "Saída p/ Produção", ultimaMovData: "2026-08-25",
+      quantidadeMovimentada: 3, ultimoEnderecoConhecido: "D-02-01", imagemHistorico: null,
+      observacoesAnalista: "",
+      status: "aguardando_analise",
+      situacaoEncontrada: "Quantidade física diferente da quantidade do sistema",
+      casasEnderecos: [{ id: "c1", endereco: "D-02-01", quantidadeSistema: 20, quantidadeEncontrada: 19, origemImagem: true }],
+      observacoesConferente: "Contagem confere com o físico encontrado.",
+      evidenciaFotografica: null,
+      resultadoInvestigacao: "", setorCausador: "", causaRaiz: "", tratativaAplicada: "",
+      valorFinalDivergencia: "", parecerFinal: "", dataConclusao: null,
+    },
+    {
+      id: "PND-0498", prioridade: "C", dataAbertura: "2026-08-20", analista: "J. Souza",
+      codigoMaterial: "MAT-001987", descricaoMaterial: "Correia dentada 850mm",
+      familiaGrupo: "Peças de Reposição — Transmissão", unidadeMedida: "UN",
+      almoxarifado: "ALM-02 — Manutenção", enderecoSistema: "C-01-08",
+      imagemEndereco: null, quantidadeSistema: 12, quantidadeInventario: 10,
+      valorUnitario: 130, ultimaMovTipo: "Transferência", ultimaMovData: "2026-08-15",
+      quantidadeMovimentada: 2, ultimoEnderecoConhecido: "C-01-08", imagemHistorico: null,
+      observacoesAnalista: "",
+      status: "concluida",
+      situacaoEncontrada: "Material encontrado no endereço correto",
+      casasEnderecos: [{ id: "c1", endereco: "C-01-08", quantidadeSistema: 12, quantidadeEncontrada: 10, origemImagem: true }],
+      observacoesConferente: "Confere com o sistema.",
+      evidenciaFotografica: null,
+      resultadoInvestigacao: "Divergência Confirmada", setorCausador: "Movimentação Interna",
+      causaRaiz: "Erro de Contagem", tratativaAplicada: "Ajuste de Estoque no Sistema",
+      valorFinalDivergencia: 260, parecerFinal: "Ajuste realizado no sistema; divergência baixa e sem impacto operacional.",
+      dataConclusao: "2026-08-22",
+    },
+    {
+      id: "PND-0455", prioridade: "B", dataAbertura: "2026-08-02", analista: "R. Alves",
+      codigoMaterial: "MAT-003310", descricaoMaterial: "Sensor de proximidade indutivo",
+      familiaGrupo: "Elétrica/Automação", unidadeMedida: "UN",
+      almoxarifado: "ALM-03 — Elétrica", enderecoSistema: "E-01-04",
+      imagemEndereco: null, quantidadeSistema: 8, quantidadeInventario: 6,
+      valorUnitario: 210, ultimaMovTipo: "Saída p/ Manutenção", ultimaMovData: "2026-07-28",
+      quantidadeMovimentada: 2, ultimoEnderecoConhecido: "E-01-04", imagemHistorico: null,
+      observacoesAnalista: "",
+      status: "concluida",
+      situacaoEncontrada: "Material não localizado",
+      casasEnderecos: [{ id: "c1", endereco: "E-01-04", quantidadeSistema: 8, quantidadeEncontrada: 6, origemImagem: true }],
+      observacoesConferente: "Não encontrado no endereço; possível uso não apontado.",
+      evidenciaFotografica: null,
+      resultadoInvestigacao: "Divergência Confirmada", setorCausador: "Sistema/Cadastro",
+      causaRaiz: "Erro de Lançamento no Sistema", tratativaAplicada: "Ajuste de Estoque no Sistema",
+      valorFinalDivergencia: 420, parecerFinal: "Saída para manutenção não havia sido lançada no sistema; regularizado.",
+      dataConclusao: "2026-08-06",
+    },
+    {
+      id: "PND-0440", prioridade: "A", dataAbertura: "2026-07-18", analista: "J. Souza",
+      codigoMaterial: "MAT-005120", descricaoMaterial: "Válvula solenoide 24V",
+      familiaGrupo: "Peças de Reposição — Hidráulica", unidadeMedida: "UN",
+      almoxarifado: "ALM-01 — Produção", enderecoSistema: "D-01-09",
+      imagemEndereco: null, quantidadeSistema: 15, quantidadeInventario: 15,
+      valorUnitario: 340, ultimaMovTipo: "Recebimento", ultimaMovData: "2026-07-10",
+      quantidadeMovimentada: 5, ultimoEnderecoConhecido: "D-01-09", imagemHistorico: null,
+      observacoesAnalista: "Confirmar se houve troca de embalagem que dificulte identificação.",
+      status: "concluida",
+      situacaoEncontrada: "Material diferente do esperado",
+      casasEnderecos: [{ id: "c1", endereco: "D-01-09", quantidadeSistema: 15, quantidadeEncontrada: 15, origemImagem: true }],
+      observacoesConferente: "Peças corretas, apenas com etiqueta antiga do fornecedor.",
+      evidenciaFotografica: null,
+      resultadoInvestigacao: "Divergência Não Confirmada", setorCausador: "Recebimento",
+      causaRaiz: "Duplicidade de Cadastro", tratativaAplicada: "Nenhuma Ação Necessária",
+      valorFinalDivergencia: 0, parecerFinal: "Sem divergência real; apenas etiqueta de fornecedor desatualizada.",
+      dataConclusao: "2026-07-20",
+    },
+  ];
+  return base.map((p) => ({ ...p, diferenca: p.quantidadeInventario - p.quantidadeSistema }));
+}
+
+// ---------------------------------------------------------------------------
+// Small reusable pieces
+// ---------------------------------------------------------------------------
+function PriorityChip({ p, size = "sm" }) {
+  const m = PRIORITY[p] || PRIORITY.C;
+  const pad = size === "lg" ? "6px 14px" : "2px 10px";
+  return (
+    <span
+      className="inline-flex items-center gap-1 rounded-full font-semibold"
+      style={{ background: m.bg, color: m.fg, padding: pad, fontSize: size === "lg" ? 14 : 12, border: `1px solid ${m.ring}55` }}
+    >
+      {p} — {m.label}
+    </span>
+  );
+}
+
+function StatusChip({ s }) {
+  const m = STATUS[s] || STATUS.aguardando_conferencia;
+  return (
+    <span
+      className="inline-flex items-center rounded-full font-semibold uppercase tracking-wide"
+      style={{ background: m.bg, color: m.fg, padding: "4px 12px", fontSize: 11 }}
+    >
+      {m.label}
+    </span>
+  );
+}
+
+function Field({ label, children, hint }) {
+  return (
+    <label className="block mb-4">
+      <span className="block text-sm font-semibold mb-1" style={{ color: TEXT }}>{label}</span>
+      {children}
+      {hint && <span className="block text-xs mt-1" style={{ color: MUTED }}>{hint}</span>}
+    </label>
+  );
+}
+
+const inputStyle = {
+  width: "100%", padding: "9px 12px", borderRadius: 8, border: `1px solid ${BORDER}`,
+  fontSize: 14, color: TEXT, background: "#fff",
+};
+const editableStyle = { ...inputStyle, background: "#FFFBEA", border: "1px solid #E0C878" };
+const readonlyStyle = { ...inputStyle, background: "#FAFAFB", color: MUTED };
+
+function TextInput(props) {
+  return <input {...props} style={{ ...inputStyle, ...(props.style || {}) }} />;
+}
+function Select({ value, onChange, options, placeholder, editable = true }) {
+  return (
+    <select
+      value={value || ""}
+      onChange={onChange}
+      style={editable ? editableStyle : readonlyStyle}
+      disabled={!editable}
+    >
+      <option value="">{placeholder || "Selecionar..."}</option>
+      {options.map((o) => (
+        <option key={o} value={o}>{o}</option>
+      ))}
+    </select>
+  );
+}
+
+function ImageField({ label, image, onUpload, onRemove, editable = true, sublabel }) {
+  const inputRef = React.useRef(null);
+  const [open, setOpen] = useState(false);
+
+  function triggerPicker() {
+    if (inputRef.current) inputRef.current.click();
+  }
+
+  return (
+    <div className="mb-4">
+      <span className="block text-sm font-semibold mb-1" style={{ color: editable ? ACCENT : MUTED }}>{label}</span>
+
+      {/* Hidden file input, always mounted so the ref is stable; triggered via a real button click.
+          Note: display:none breaks the native picker on iOS/Safari when clicked programmatically —
+          use an off-screen-but-rendered input instead so .click() reliably opens the picker. */}
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        style={{ position: "absolute", width: 1, height: 1, padding: 0, margin: -1, overflow: "hidden", clip: "rect(0,0,0,0)", whiteSpace: "nowrap", border: 0 }}
+        onChange={(e) => {
+          const file = e.target.files && e.target.files[0];
+          if (file) readImage(file, onUpload);
+          e.target.value = "";
+        }}
+      />
+
+      {image ? (
+        <div className="flex items-center gap-3 rounded-lg p-2" style={{ border: `1px solid ${BORDER}`, background: "#FAFAFB" }}>
+          <button type="button" onClick={() => setOpen(true)} className="shrink-0" title="Ampliar imagem">
+            <img src={image.dataUrl} alt={image.name} className="rounded object-cover" style={{ width: 52, height: 52 }} />
+          </button>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm truncate" style={{ color: TEXT }}>{image.name}</p>
+            <p className="text-xs" style={{ color: MUTED }}>{sublabel || "Anexado"}</p>
+          </div>
+          <button type="button" onClick={() => setOpen(true)} className="text-sm font-semibold" style={{ color: ACCENT }}>Ampliar</button>
+          {editable && (
+            <button type="button" onClick={onRemove} className="p-1 rounded hover:bg-red-50" title="Remover">
+              <X size={16} color="#B33" />
+            </button>
+          )}
+        </div>
+      ) : editable ? (
+        <button
+          type="button"
+          onClick={triggerPicker}
+          className="flex items-center gap-2 rounded-lg cursor-pointer justify-center w-full"
+          style={{ border: `2px dashed #B7C878`, padding: "16px", color: ACCENT, background: "#F6F8EC" }}
+        >
+          <Upload size={16} />
+          <span className="text-sm font-medium">Anexar imagem (print do sistema)</span>
+        </button>
+      ) : (
+        <p className="text-sm italic" style={{ color: MUTED }}>Nenhuma imagem anexada.</p>
+      )}
+      {open && image && (
+        <div className="fixed inset-0 flex items-center justify-center p-8 z-50" style={{ background: "rgba(20,25,35,0.75)" }} onClick={() => setOpen(false)}>
+          <img src={image.dataUrl} alt={image.name} className="max-h-full max-w-full rounded-lg shadow-2xl" />
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Campo de imagem do histórico — além de anexar a foto/print, roda OCR e
+// devolve uma lista revisável de Endereço + Qtd. Sistema para o analista
+// conferir antes de salvar a pendência.
+// ---------------------------------------------------------------------------
+function HistoricoImageField({ image, onUpload, onRemove, linhas, onLinhasChange }) {
+  const [lendo, setLendo] = useState(false);
+  const [erro, setErro] = useState("");
+
+  async function handleUpload(img) {
+    onUpload(img);
+    setErro("");
+    setLendo(true);
+    try {
+      const extraidas = await extrairHistoricoDaImagem(img.dataUrl);
+      onLinhasChange(extraidas);
+      if (extraidas.length === 0) {
+        setErro("Não foi possível identificar linhas automaticamente. Adicione manualmente abaixo.");
+      }
+    } catch (e) {
+      setErro("Falha ao ler a imagem automaticamente. Adicione os endereços manualmente abaixo.");
+    } finally {
+      setLendo(false);
+    }
+  }
+
+  function addLinha() {
+    onLinhasChange([...linhas, { id: Math.random().toString(36).slice(2), endereco: "", quantidadeSistema: "", quantidadeEncontrada: "", origemImagem: false }]);
+  }
+  function updateLinha(id, patch) {
+    onLinhasChange(linhas.map((l) => (l.id === id ? { ...l, ...patch } : l)));
+  }
+  function removeLinha(id) {
+    onLinhasChange(linhas.filter((l) => l.id !== id));
+  }
+
+  return (
+    <div className="mb-4">
+      <ImageField
+        label="Imagem do histórico de movimentações (relatório do sistema)"
+        image={image}
+        onUpload={handleUpload}
+        onRemove={() => { onRemove(); onLinhasChange([]); setErro(""); }}
+        sublabel="Lemos automaticamente Pos.origem e QtdTeor D"
+      />
+
+      {lendo && (
+        <p className="text-xs font-semibold flex items-center gap-2" style={{ color: ACCENT }}>
+          Lendo endereços e quantidades da imagem…
+        </p>
+      )}
+      {!lendo && erro && (
+        <p className="text-xs italic mb-2" style={{ color: "#96282A" }}>{erro}</p>
+      )}
+
+      {!lendo && (image || linhas.length > 0) && (
+        <div className="mt-2">
+          <span className="block text-sm font-semibold mb-2" style={{ color: TEXT }}>
+            Endereços identificados ({linhas.length}) — revise antes de salvar
+          </span>
+          <div className="flex flex-col gap-2 mb-2">
+            {linhas.map((l) => (
+              <div key={l.id} className="grid grid-cols-12 gap-2 items-center rounded-lg p-2" style={{ background: "#FFFBEA", border: "1px solid #E0C878" }}>
+                <input
+                  className="col-span-6"
+                  style={{ ...inputStyle, background: "transparent", border: "none", padding: "4px" }}
+                  placeholder="Endereço (Pos.origem)"
+                  value={l.endereco}
+                  onChange={(e) => updateLinha(l.id, { endereco: e.target.value })}
+                />
+                <input
+                  className="col-span-5"
+                  type="number"
+                  style={{ ...inputStyle, background: "transparent", border: "none", padding: "4px" }}
+                  placeholder="Qtd. Sistema"
+                  value={l.quantidadeSistema}
+                  onChange={(e) => updateLinha(l.id, { quantidadeSistema: e.target.value })}
+                />
+                <button className="col-span-1 flex justify-center" onClick={() => removeLinha(l.id)} title="Remover linha">
+                  <X size={15} color="#B33" />
+                </button>
+              </div>
+            ))}
+          </div>
+          <button onClick={addLinha} className="flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-semibold" style={{ border: `2px solid ${ACCENT}`, color: ACCENT }}>
+            <Plus size={14} /> Adicionar linha manualmente
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function KpiCard({ label, value, accent }) {
+  return (
+    <div className="rounded-xl p-4 flex-1" style={{ background: "#fff", border: `1px solid ${BORDER}` }}>
+      <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: MUTED }}>{label}</p>
+      <p className="text-2xl font-bold mt-1" style={{ color: accent || NAVY }}>{value}</p>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Tela Inicial — ícone/título do app + seleção de perfil, tudo em uma tela
+// ---------------------------------------------------------------------------
+const PERFIL_ICONS = { analista: User, conferente: ShieldCheck, gestor: Users };
+const PERFIL_DESC = {
+  analista: "Cadastra pendências, acompanha conferências e faz a análise final",
+  conferente: "Confere pendências no estoque e registra o que encontrou",
+  gestor: "Acesso completo a cadastro, pendências, análise e indicadores",
+};
+
+function TelaSplash({ onSelect }) {
+  return (
+    <div className="flex flex-col items-center text-center pt-6 sm:pt-10">
+      <div
+        className="flex items-center justify-center rounded-full shadow-lg"
+        style={{ width: 100, height: 100, background: ACCENT, border: `5px solid #fff`, boxShadow: "0 10px 30px rgba(63,74,18,0.25)" }}
+      >
+        <Package size={44} color="#fff" strokeWidth={1.75} />
+      </div>
+      <h1 className="text-xl sm:text-2xl font-bold mt-5" style={{ color: TEXT }}>Gestão de Pendências - Inventário</h1>
+      <p className="text-sm mt-1 mb-7" style={{ color: MUTED }}>Escolha seu perfil para continuar</p>
+
+      <div className="flex flex-col gap-3 w-full max-w-md text-left">
+        {Object.keys(PERFIS).map((key) => {
+          const Icon = PERFIL_ICONS[key];
+          return (
+            <button
+              key={key}
+              onClick={() => onSelect(key)}
+              className="flex items-center gap-4 rounded-xl p-4 sm:p-5 text-left hover:shadow-md transition-shadow w-full"
+              style={{ background: "#fff", border: `1px solid ${BORDER}` }}
+            >
+              <div className="flex items-center justify-center rounded-full shrink-0" style={{ width: 48, height: 48, background: "#EDF2DC" }}>
+                <Icon size={22} color={ACCENT} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-bold text-base" style={{ color: TEXT }}>{PERFIS[key].label}</p>
+                <p className="text-xs sm:text-sm" style={{ color: MUTED }}>{PERFIL_DESC[key]}</p>
+              </div>
+              <ChevronRight size={20} color={MUTED} className="shrink-0" />
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Tela Inicial — passo 2: menu com as opções principais
+// ---------------------------------------------------------------------------
+function TelaMenu({ pendencias, goTo, perfil }) {
+  const counts = useMemo(() => {
+    const c = { aguardando_conferencia: 0, aguardando_analise: 0, concluida: 0, necessita_nova_conferencia: 0 };
+    pendencias.forEach((p) => { c[p.status] = (c[p.status] || 0) + 1; });
+    return c;
+  }, [pendencias]);
+
+  const emAberto = counts.aguardando_conferencia + counts.aguardando_analise + counts.necessita_nova_conferencia;
+
+  const subtitles = {
+    cadastro: "Adicione uma divergência para o conferente investigar",
+    pendencias: `${emAberto} em aberto · ${counts.concluida || 0} concluídas`,
+    indicadores: "Gráficos de status, prioridade e tempo médio",
+  };
+
+  const itensVisiveis = MENU_ITEMS.filter((item) => podeAcessar(perfil, item.key));
+
+  return (
+    <div>
+      <h1 className="text-xl sm:text-2xl font-bold mb-1" style={{ color: TEXT }}>O que você quer fazer?</h1>
+      <p className="text-sm mb-6" style={{ color: MUTED }}>Escolha uma opção para continuar.</p>
+
+      <div className="flex flex-col gap-3">
+        {itensVisiveis.map((item) => {
+          const Icon = item.icon;
+          return (
+            <button
+              key={item.key}
+              onClick={() => goTo(item.key)}
+              className="flex items-center gap-4 rounded-xl p-4 sm:p-5 text-left hover:shadow-md transition-shadow w-full"
+              style={{ background: "#fff", border: `1px solid ${BORDER}` }}
+            >
+              <div className="flex items-center justify-center rounded-full shrink-0" style={{ width: 48, height: 48, background: "#EDF2DC" }}>
+                <Icon size={22} color={ACCENT} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-bold text-base" style={{ color: TEXT }}>{item.label}</p>
+                <p className="text-xs sm:text-sm truncate" style={{ color: MUTED }}>{subtitles[item.key]}</p>
+              </div>
+              <ChevronRight size={20} color={MUTED} className="shrink-0" />
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Aba 1 — Cadastrar Pendência
+// ---------------------------------------------------------------------------
+function TelaCadastro({ onCreate, goTo }) {
+  const hoje = new Date().toISOString().slice(0, 10);
+  const empty = {
+    prioridade: "B", analista: "J. Souza", dataAbertura: hoje, codigoMaterial: "", descricaoMaterial: "",
+    familiaGrupo: "", unidadeMedida: "UN", enderecoSistema: "",
+    imagemEndereco: null, quantidadeSistema: "", quantidadeInventario: "", valorUnitario: "",
+    imagemHistorico: null, casasEnderecos: [], observacoesAnalista: "",
+  };
+  const [f, setF] = useState(empty);
+  const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
+
+  const diferenca = (Number(f.quantidadeInventario) || 0) - (Number(f.quantidadeSistema) || 0);
+  const valorTotal = Math.abs(diferenca) * (Number(f.valorUnitario) || 0);
+
+  function submit() {
+    if (!f.codigoMaterial || !f.descricaoMaterial || !f.enderecoSistema) {
+      alert("Preencha ao menos código, descrição e endereço no sistema.");
+      return;
+    }
+    const novo = {
+      ...f, id: nextId(), dataAbertura: f.dataAbertura || hoje,
+      quantidadeSistema: Number(f.quantidadeSistema) || 0,
+      quantidadeInventario: Number(f.quantidadeInventario) || 0,
+      diferenca, valorUnitario: Number(f.valorUnitario) || 0,
+      status: "aguardando_conferencia",
+      // casasEnderecos vem do que foi extraído (ou digitado) na imagem do
+      // histórico; o conferente só vai preencher a quantidadeEncontrada.
+      situacaoEncontrada: "", observacoesConferente: "", evidenciaFotografica: null,
+      resultadoInvestigacao: "", setorCausador: "", causaRaiz: "", tratativaAplicada: "",
+      valorFinalDivergencia: "", parecerFinal: "", dataConclusao: null,
+    };
+    onCreate(novo);
+    setF(empty);
+    goTo("menu");
+  }
+
+  return (
+    <div>
+      <button onClick={() => goTo("menu")} className="flex items-center gap-1 text-sm font-semibold mb-3" style={{ color: ACCENT }}><ArrowLeft size={15} /> Voltar</button>
+      <h1 className="text-xl sm:text-2xl font-bold mb-1" style={{ color: TEXT }}>Nova Pendência de Inventário</h1>
+      <p className="text-sm mb-5" style={{ color: MUTED }}>Preencha os dados do sistema para orientar a conferência física.</p>
+
+      <div className="mb-6">
+        <span className="block text-sm font-semibold mb-2" style={{ color: TEXT }}>Prioridade</span>
+        <div className="flex gap-2 items-center flex-wrap">
+          {Object.keys(PRIORITY).map((k) => (
+            <button
+              key={k}
+              onClick={() => setF({ ...f, prioridade: k })}
+              className="rounded-full"
+              style={{
+                padding: "8px 16px", fontSize: 13, fontWeight: 600,
+                background: f.prioridade === k ? PRIORITY[k].bg : "#fff",
+                color: f.prioridade === k ? PRIORITY[k].fg : MUTED,
+                border: `2px solid ${f.prioridade === k ? PRIORITY[k].ring : BORDER}`,
+              }}
+            >
+              {k} — {PRIORITY[k].label}
+            </button>
+          ))}
+          <span className="text-xs" style={{ color: MUTED }}>define a ordem de atendimento pelo conferente</span>
+        </div>
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-x-8">
+        <div>
+          <Field label="Analista Responsável"><TextInput value={f.analista} onChange={set("analista")} /></Field>
+          <Field label="Data da Pendência"><TextInput type="date" value={f.dataAbertura} onChange={set("dataAbertura")} /></Field>
+          <Field label="Código do Material"><TextInput value={f.codigoMaterial} onChange={set("codigoMaterial")} placeholder="MAT-000000" /></Field>
+          <Field label="Descrição do Material"><TextInput value={f.descricaoMaterial} onChange={set("descricaoMaterial")} /></Field>
+          <Field label="Família / Grupo"><TextInput value={f.familiaGrupo} onChange={set("familiaGrupo")} /></Field>
+          <Field label="Unidade de Medida"><TextInput value={f.unidadeMedida} onChange={set("unidadeMedida")} /></Field>
+          <Field label="Endereço no Sistema"><TextInput value={f.enderecoSistema} onChange={set("enderecoSistema")} placeholder="A-02-15" /></Field>
+          <ImageField
+            label='Imagem do endereço no sistema (pode ter mais de uma "casa" no mesmo endereço)'
+            image={f.imagemEndereco}
+            onUpload={(img) => setF({ ...f, imagemEndereco: img })}
+            onRemove={() => setF({ ...f, imagemEndereco: null })}
+            sublabel={`Anexado por ${f.analista || "analista"}`}
+          />
+        </div>
+        <div>
+          <Field label="Quantidade no Sistema"><TextInput type="number" value={f.quantidadeSistema} onChange={set("quantidadeSistema")} /></Field>
+          <Field label="Quantidade no Inventário"><TextInput type="number" value={f.quantidadeInventario} onChange={set("quantidadeInventario")} /></Field>
+          <Field label="Diferença (calculada)"><TextInput value={diferenca} disabled style={readonlyStyle} /></Field>
+          <Field label="Valor Unitário"><TextInput type="number" value={f.valorUnitario} onChange={set("valorUnitario")} /></Field>
+          <Field label="Valor Total da Divergência (calculado)"><TextInput value={fmtMoney(valorTotal)} disabled style={readonlyStyle} /></Field>
+          <HistoricoImageField
+            image={f.imagemHistorico}
+            onUpload={(img) => setF({ ...f, imagemHistorico: img })}
+            onRemove={() => setF({ ...f, imagemHistorico: null })}
+            linhas={f.casasEnderecos}
+            onLinhasChange={(linhas) => setF({ ...f, casasEnderecos: linhas })}
+          />
+        </div>
+      </div>
+
+      <Field label="Observações / Orientações para o Conferente">
+        <textarea rows={3} value={f.observacoesAnalista} onChange={set("observacoesAnalista")} style={inputStyle} />
+      </Field>
+
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-6">
+        <StatusChip s="aguardando_conferencia" />
+        <div className="flex gap-3">
+          <button onClick={() => { setF(empty); goTo("menu"); }} className="flex-1 sm:flex-none rounded-lg px-5 py-2 text-sm font-semibold" style={{ border: `1px solid ${BORDER}`, color: TEXT }}>Cancelar</button>
+          <button onClick={submit} className="flex-1 sm:flex-none rounded-lg px-5 py-2 text-sm font-semibold text-white" style={{ background: ACCENT }}>Salvar Pendência</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Aba 2 — Pendências (Conferente)
+// ---------------------------------------------------------------------------
+function TelaPendencias({ pendencias, update, goTo, selecionar, initialId, perfil }) {
+  const [view, setView] = useState(initialId ? "detalhe" : "lista");
+  const [selId, setSelId] = useState(initialId || null);
+  const [filtroStatus, setFiltroStatus] = useState("");
+  const [filtroDataDe, setFiltroDataDe] = useState("");
+  const [filtroDataAte, setFiltroDataAte] = useState("");
+
+  const ordered = useMemo(() => {
+    return [...pendencias]
+      .filter((p) => (filtroStatus ? p.status === filtroStatus : true))
+      .filter((p) => (filtroDataDe ? p.dataAbertura >= filtroDataDe : true))
+      .filter((p) => (filtroDataAte ? p.dataAbertura <= filtroDataAte : true))
+      .sort((a, b) => a.prioridade.localeCompare(b.prioridade) || new Date(a.dataAbertura) - new Date(b.dataAbertura));
+  }, [pendencias, filtroStatus, filtroDataDe, filtroDataAte]);
+
+  const sel = pendencias.find((p) => p.id === selId);
+  const editable = sel && (sel.status === "aguardando_conferencia" || sel.status === "necessita_nova_conferencia");
+
+  function acessar(p) {
+    if (precisaAnaliseFinal(p.status) && podeAcessar(perfil, "analise")) {
+      // Essa pendência já passou da conferência — abre direto na Análise Final
+      // (somente para quem tem acesso a essa aba; o Conferente fica na visão
+      // somente-leitura desta própria tela).
+      selecionar(p.id);
+      goTo("analise");
+      return;
+    }
+    setSelId(p.id);
+    setView("detalhe");
+  }
+
+  function limparFiltros() {
+    setFiltroStatus("");
+    setFiltroDataDe("");
+    setFiltroDataAte("");
+  }
+
+  function addCasa() {
+    const list = [...sel.casasEnderecos, { id: Math.random().toString(36).slice(2), endereco: "", quantidadeSistema: "", quantidadeEncontrada: "", origemImagem: false }];
+    update(sel.id, { casasEnderecos: list });
+  }
+  function updateCasa(cid, patch) {
+    update(sel.id, { casasEnderecos: sel.casasEnderecos.map((c) => (c.id === cid ? { ...c, ...patch } : c)) });
+  }
+  function removeCasa(cid) {
+    update(sel.id, { casasEnderecos: sel.casasEnderecos.filter((c) => c.id !== cid) });
+  }
+  function registrar() {
+    if (!sel.situacaoEncontrada) { alert("Selecione a situação encontrada."); return; }
+    if (sel.casasEnderecos.length === 0) { alert("Adicione ao menos um endereço (da imagem do histórico ou manualmente)."); return; }
+    if (sel.casasEnderecos.some((c) => c.quantidadeEncontrada === "" || c.quantidadeEncontrada === null)) {
+      alert("Preencha a quantidade encontrada em todos os endereços listados.");
+      return;
+    }
+    update(sel.id, { status: "aguardando_analise" });
+    setView("lista");
+  }
+
+  // -------------------------------------------------------------- Lista
+  if (view === "lista" || !sel) {
+    return (
+      <div>
+        <button onClick={() => goTo("menu")} className="flex items-center gap-1 text-sm font-semibold mb-3" style={{ color: ACCENT }}><ArrowLeft size={15} /> Voltar</button>
+        <h1 className="text-xl sm:text-2xl font-bold mb-1" style={{ color: TEXT }}>Pendências de Inventário</h1>
+        <p className="text-sm mb-5" style={{ color: MUTED }}>Filtre a lista e toque em "Acessar" para abrir uma pendência.</p>
+
+        <div className="rounded-xl p-3 sm:p-4 mb-5 flex flex-col sm:flex-row sm:items-end gap-3" style={{ background: "#fff", border: `1px solid ${BORDER}` }}>
+          <div className="flex items-center gap-2 shrink-0" style={{ color: MUTED }}>
+            <Filter size={16} />
+            <span className="text-xs font-bold uppercase tracking-wide">Filtros</span>
+          </div>
+          <div className="flex-1 min-w-0">
+            <span className="block text-xs font-semibold mb-1" style={{ color: TEXT }}>Status</span>
+            <select value={filtroStatus} onChange={(e) => setFiltroStatus(e.target.value)} style={inputStyle}>
+              <option value="">Todos os status</option>
+              {Object.keys(STATUS).map((k) => (
+                <option key={k} value={k}>{STATUS[k].label}</option>
+              ))}
+            </select>
+          </div>
+          <div className="flex-1 min-w-0">
+            <span className="block text-xs font-semibold mb-1" style={{ color: TEXT }}>De</span>
+            <TextInput type="date" value={filtroDataDe} onChange={(e) => setFiltroDataDe(e.target.value)} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <span className="block text-xs font-semibold mb-1" style={{ color: TEXT }}>Até</span>
+            <TextInput type="date" value={filtroDataAte} onChange={(e) => setFiltroDataAte(e.target.value)} />
+          </div>
+          {(filtroStatus || filtroDataDe || filtroDataAte) && (
+            <button onClick={limparFiltros} className="text-sm font-semibold shrink-0" style={{ color: ACCENT }}>Limpar filtros</button>
+          )}
+        </div>
+
+        <div className="rounded-xl overflow-hidden" style={{ border: `1px solid ${BORDER}` }}>
+          {/* Header row: table-like, desktop only */}
+          <div className="hidden sm:grid grid-cols-12 px-4 py-2 text-xs font-semibold uppercase tracking-wide" style={{ background: "#F0F2E6", color: MUTED }}>
+            <div className="col-span-1">Prior.</div>
+            <div className="col-span-2">ID</div>
+            <div className="col-span-2">Data</div>
+            <div className="col-span-3">Material</div>
+            <div className="col-span-2">Status</div>
+            <div className="col-span-2 text-right">Ação</div>
+          </div>
+          {ordered.length === 0 && (
+            <p className="px-4 py-6 text-sm text-center" style={{ color: MUTED }}>Nenhuma pendência encontrada para os filtros selecionados.</p>
+          )}
+          {ordered.map((p) => (
+            <div key={p.id} className="px-4 py-3 text-sm" style={{ background: "#fff", borderTop: `1px solid ${BORDER}` }}>
+              {/* Mobile card layout */}
+              <div className="flex flex-col gap-2 sm:hidden">
+                <div className="flex items-center justify-between">
+                  <PriorityChip p={p.prioridade} />
+                  <StatusChip s={p.status} />
+                </div>
+                <p className="font-semibold truncate" style={{ color: TEXT }}>{p.id} <span className="font-normal" style={{ color: MUTED }}>— {p.descricaoMaterial}</span></p>
+                <div className="flex items-center justify-between text-xs" style={{ color: MUTED }}>
+                  <span className="truncate">{p.enderecoSistema}</span>
+                  <span>{fmtDate(p.dataAbertura)}</span>
+                </div>
+                <button onClick={() => acessar(p)} className="rounded-lg px-4 py-2 text-sm font-semibold text-white w-full" style={{ background: ACCENT }}>Acessar</button>
+              </div>
+              {/* Desktop table row */}
+              <div className="hidden sm:grid grid-cols-12 items-center">
+                <div className="col-span-1"><PriorityChip p={p.prioridade} /></div>
+                <div className="col-span-2 font-semibold" style={{ color: TEXT }}>{p.id}</div>
+                <div className="col-span-2" style={{ color: MUTED }}>{fmtDate(p.dataAbertura)}</div>
+                <div className="col-span-3 truncate" style={{ color: TEXT }}>{p.descricaoMaterial}</div>
+                <div className="col-span-2"><StatusChip s={p.status} /></div>
+                <div className="col-span-2 text-right">
+                  <button onClick={() => acessar(p)} className="rounded-lg px-4 py-1.5 text-xs font-semibold text-white" style={{ background: ACCENT }}>Acessar</button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // -------------------------------------------------------------- Detalhe
+  return (
+    <div>
+      <button onClick={() => setView("lista")} className="flex items-center gap-1 text-sm font-semibold mb-3" style={{ color: ACCENT }}><ArrowLeft size={15} /> Voltar à lista</button>
+
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-4">
+        <h2 className="text-lg sm:text-xl font-bold" style={{ color: TEXT }}>Detalhe da Pendência — {sel.id}</h2>
+        <div className="flex items-center gap-2">
+          <PriorityChip p={sel.prioridade} size="lg" />
+          <StatusChip s={sel.status} />
+        </div>
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-x-8">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-wide mb-3" style={{ color: MUTED }}>Dados do analista (somente leitura)</p>
+          <Field label="Data da Pendência"><TextInput disabled style={readonlyStyle} value={fmtDate(sel.dataAbertura)} /></Field>
+          <Field label="Código / Descrição do Material"><TextInput disabled style={readonlyStyle} value={`${sel.codigoMaterial} — ${sel.descricaoMaterial}`} /></Field>
+          <Field label="Endereço no Sistema"><TextInput disabled style={readonlyStyle} value={sel.enderecoSistema} /></Field>
+          <Field label="Quantidade Sistema / Inventário"><TextInput disabled style={readonlyStyle} value={`${sel.quantidadeSistema} / ${sel.quantidadeInventario}`} /></Field>
+          {sel.observacoesAnalista && (
+            <Field label="Orientações do Analista"><TextInput disabled style={readonlyStyle} value={sel.observacoesAnalista} /></Field>
+          )}
+          <ImageField label="Imagem do Endereço (sistema)" image={sel.imagemEndereco} editable={false} sublabel="Anexado pelo analista" />
+          <ImageField label="Imagem do Histórico de Movimentações" image={sel.imagemHistorico} editable={false} sublabel="Anexado pelo analista" />
+        </div>
+
+        <div>
+          <p className="text-xs font-bold uppercase tracking-wide mb-3" style={{ color: "#8A5A00" }}>Registro do conferente</p>
+          <Field label="Situação Encontrada">
+            <Select value={sel.situacaoEncontrada} onChange={(e) => update(sel.id, { situacaoEncontrada: e.target.value })} options={SITUACOES} editable={editable} />
+          </Field>
+
+          <span className="block text-sm font-semibold mb-2" style={{ color: editable ? "#8A5A00" : MUTED }}>Endereços do Histórico do Sistema</span>
+          {sel.casasEnderecos.length > 0 && (
+            <div className="hidden sm:grid grid-cols-12 gap-2 px-2 mb-1 text-xs font-semibold uppercase tracking-wide" style={{ color: MUTED }}>
+              <div className="col-span-5">Endereço</div>
+              <div className="col-span-3">Qtd. Sistema</div>
+              <div className="col-span-3">Qtd. Encontrada</div>
+            </div>
+          )}
+          <div className="flex flex-col gap-2 mb-2">
+            {sel.casasEnderecos.map((c) => (
+              <div key={c.id} className="grid grid-cols-2 sm:grid-cols-12 gap-2 items-center rounded-lg p-2" style={{ background: editable ? "#FFFBEA" : "#FAFAFB", border: `1px solid ${editable ? "#E0C878" : BORDER}` }}>
+                <input
+                  className="col-span-2 sm:col-span-5"
+                  style={{ ...inputStyle, background: "transparent", border: "none", padding: "4px" }}
+                  placeholder="Endereço"
+                  value={c.endereco}
+                  disabled={!editable || c.origemImagem}
+                  onChange={(e) => updateCasa(c.id, { endereco: e.target.value })}
+                />
+                <input
+                  className="col-span-1 sm:col-span-3"
+                  type="number"
+                  style={{ ...inputStyle, background: "transparent", border: "none", padding: "4px" }}
+                  placeholder="Qtd. Sistema"
+                  value={c.quantidadeSistema}
+                  disabled={!editable || c.origemImagem}
+                  onChange={(e) => updateCasa(c.id, { quantidadeSistema: e.target.value })}
+                />
+                <input
+                  className="col-span-1 sm:col-span-3"
+                  type="number"
+                  style={{ ...inputStyle, background: editable ? "#fff" : "transparent", border: `1px solid ${editable ? BORDER : "transparent"}`, padding: "4px", borderRadius: 6 }}
+                  placeholder="Qtd. Encontrada"
+                  value={c.quantidadeEncontrada}
+                  disabled={!editable}
+                  onChange={(e) => updateCasa(c.id, { quantidadeEncontrada: e.target.value })}
+                />
+                {editable && !c.origemImagem && (
+                  <button className="sm:col-span-1 flex justify-center" onClick={() => removeCasa(c.id)} title="Remover linha manual">
+                    <Trash2 size={15} color="#B33" />
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+          {editable && (
+            <button onClick={addCasa} className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold mb-4" style={{ border: `2px solid ${ACCENT}`, color: ACCENT }}>
+              <Plus size={15} /> Adicionar Endereço Encontrado (fora da imagem)
+            </button>
+          )}
+
+          <Field label="Observações do Conferente">
+            <textarea rows={3} disabled={!editable} style={editable ? editableStyle : readonlyStyle} value={sel.observacoesConferente} onChange={(e) => update(sel.id, { observacoesConferente: e.target.value })} />
+          </Field>
+
+          <ImageField
+            label="Evidência Fotográfica"
+            image={sel.evidenciaFotografica}
+            editable={editable}
+            onUpload={(img) => update(sel.id, { evidenciaFotografica: img })}
+            onRemove={() => update(sel.id, { evidenciaFotografica: null })}
+            sublabel="Anexado pelo conferente"
+          />
+
+          {editable ? (
+            <button onClick={registrar} className="rounded-lg px-5 py-2 text-sm font-semibold text-white mt-2" style={{ background: ACCENT }}>
+              Registrar Conferência
+            </button>
+          ) : (
+            <p className="text-xs italic mt-2" style={{ color: MUTED }}>
+              {sel.status === "concluida" ? "Pendência já concluída — dados bloqueados." : "Aguardando análise final do analista — dados bloqueados."}
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Aba 3 — Análise Final (Analista)
+// ---------------------------------------------------------------------------
+function TelaAnaliseFinal({ pendencias, update, goTo, selecionar, initialId }) {
+  const relevantes = useMemo(
+    () => pendencias.filter((p) => precisaAnaliseFinal(p.status)).sort((a, b) => new Date(b.dataAbertura) - new Date(a.dataAbertura)),
+    [pendencias]
+  );
+  const [selId, setSelId] = useState(initialId && pendencias.find((p) => p.id === initialId && precisaAnaliseFinal(p.status)) ? initialId : relevantes[0]?.id);
+  const sel = pendencias.find((p) => p.id === selId);
+  const editable = sel && sel.status === "aguardando_analise";
+
+  function concluir() {
+    if (!sel.resultadoInvestigacao || !sel.setorCausador || !sel.causaRaiz || !sel.tratativaAplicada) {
+      alert("Preencha resultado, setor causador, causa raiz e tratativa antes de concluir.");
+      return;
+    }
+    update(sel.id, { status: "concluida", dataConclusao: new Date().toISOString().slice(0, 10) });
+  }
+  function reabrir() {
+    update(sel.id, { status: "necessita_nova_conferencia" });
+    // Volta para o conferente com essa pendência já selecionada.
+    selecionar(sel.id);
+    goTo("pendencias");
+  }
+
+  function voltar() {
+    selecionar(null);
+    goTo("pendencias");
+  }
+
+  if (!sel) return (
+    <div>
+      <button onClick={voltar} className="flex items-center gap-1 text-sm font-semibold mb-3" style={{ color: ACCENT }}><ArrowLeft size={15} /> Voltar</button>
+      <p style={{ color: MUTED }}>Nenhuma pendência aguardando análise no momento.</p>
+    </div>
+  );
+
+  return (
+    <div>
+      <button onClick={voltar} className="flex items-center gap-1 text-sm font-semibold mb-3" style={{ color: ACCENT }}><ArrowLeft size={15} /> Voltar às Pendências</button>
+      <h1 className="text-xl sm:text-2xl font-bold mb-1" style={{ color: TEXT }}>Análise Final da Pendência</h1>
+      <p className="text-sm mb-5" style={{ color: MUTED }}>Revise o que foi encontrado pelo conferente e registre o parecer final.</p>
+
+      <div className="flex flex-wrap gap-2 mb-5">
+        {relevantes.map((p) => (
+          <button
+            key={p.id}
+            onClick={() => setSelId(p.id)}
+            className="rounded-lg px-3 py-2 text-xs font-semibold flex items-center gap-2"
+            style={{ background: p.id === selId ? "#EDF2DC" : "#fff", border: `1px solid ${p.id === selId ? ACCENT : BORDER}`, color: TEXT }}
+          >
+            {p.id} <StatusChip s={p.status} />
+          </button>
+        ))}
+      </div>
+
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-5">
+        <h2 className="text-lg sm:text-xl font-bold" style={{ color: TEXT }}>Pendência {sel.id}</h2>
+        <div className="flex items-center gap-2">
+          <PriorityChip p={sel.prioridade} size="lg" />
+          <StatusChip s={sel.status} />
+        </div>
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-x-8">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-wide mb-3" style={{ color: MUTED }}>Revisão (somente leitura)</p>
+          <Field label="Código / Descrição do Material"><TextInput disabled style={readonlyStyle} value={`${sel.codigoMaterial} — ${sel.descricaoMaterial}`} /></Field>
+          <Field label="Endereço / Qtd Sistema / Inventário"><TextInput disabled style={readonlyStyle} value={`${sel.enderecoSistema}  |  ${sel.quantidadeSistema} / ${sel.quantidadeInventario}`} /></Field>
+          {sel.observacoesAnalista && <Field label="Orientações do Analista (cadastro)"><TextInput disabled style={readonlyStyle} value={sel.observacoesAnalista} /></Field>}
+          <ImageField label="Imagem do Endereço (sistema)" image={sel.imagemEndereco} editable={false} />
+          <ImageField label="Imagem do Histórico de Movimentações" image={sel.imagemHistorico} editable={false} />
+          <Field label="Situação Encontrada (conferente)"><TextInput disabled style={readonlyStyle} value={sel.situacaoEncontrada || "—"} /></Field>
+          <span className="block text-sm font-semibold mb-2" style={{ color: MUTED }}>Endereços Conferidos</span>
+          <div className="flex flex-col gap-2 mb-4">
+            {sel.casasEnderecos.map((c) => (
+              <div key={c.id} className="rounded-lg p-2 text-sm flex flex-wrap gap-x-4 gap-y-1" style={{ background: "#FAFAFB", border: `1px solid ${BORDER}` }}>
+                <span>Endereço: <b>{c.endereco || "—"}</b></span>
+                <span>Qtd. Sistema: <b>{c.quantidadeSistema === "" || c.quantidadeSistema == null ? "—" : c.quantidadeSistema}</b></span>
+                <span>Qtd. Encontrada: <b>{c.quantidadeEncontrada === "" || c.quantidadeEncontrada == null ? "—" : c.quantidadeEncontrada}</b></span>
+              </div>
+            ))}
+          </div>
+          {sel.observacoesConferente && <Field label="Observações do Conferente"><TextInput disabled style={readonlyStyle} value={sel.observacoesConferente} /></Field>}
+          <ImageField label="Evidência Fotográfica (conferente)" image={sel.evidenciaFotografica} editable={false} sublabel="Anexado pelo conferente" />
+        </div>
+
+        <div>
+          <p className="text-xs font-bold uppercase tracking-wide mb-3" style={{ color: "#8A5A00" }}>Parecer final do analista</p>
+          <Field label="Resultado da Investigação"><Select value={sel.resultadoInvestigacao} onChange={(e) => update(sel.id, { resultadoInvestigacao: e.target.value })} options={RESULTADOS} editable={editable} /></Field>
+          <Field label="Setor Causador"><Select value={sel.setorCausador} onChange={(e) => update(sel.id, { setorCausador: e.target.value })} options={SETORES} editable={editable} /></Field>
+          <Field label="Causa Raiz"><Select value={sel.causaRaiz} onChange={(e) => update(sel.id, { causaRaiz: e.target.value })} options={CAUSAS} editable={editable} /></Field>
+          <Field label="Tratativa Aplicada"><Select value={sel.tratativaAplicada} onChange={(e) => update(sel.id, { tratativaAplicada: e.target.value })} options={TRATATIVAS} editable={editable} /></Field>
+          <Field label="Valor Final da Divergência (após ajuste)">
+            <TextInput type="number" disabled={!editable} style={editable ? editableStyle : readonlyStyle} value={sel.valorFinalDivergencia} onChange={(e) => update(sel.id, { valorFinalDivergencia: e.target.value })} />
+          </Field>
+          <Field label="Observações / Parecer Final">
+            <textarea rows={3} disabled={!editable} style={editable ? editableStyle : readonlyStyle} value={sel.parecerFinal} onChange={(e) => update(sel.id, { parecerFinal: e.target.value })} />
+          </Field>
+
+          {editable ? (
+            <div className="flex flex-col sm:flex-row gap-3 mt-2">
+              <button onClick={reabrir} className="flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold" style={{ border: `1px solid ${BORDER}`, color: TEXT }}>
+                <RotateCcw size={15} /> Reabrir p/ Conferente
+              </button>
+              <button onClick={concluir} className="flex items-center justify-center gap-2 rounded-lg px-5 py-2 text-sm font-semibold text-white" style={{ background: ACCENT }}>
+                <CheckCircle2 size={16} /> Concluir Pendência
+              </button>
+            </div>
+          ) : (
+            <p className="text-xs italic mt-2" style={{ color: MUTED }}>
+              {sel.status === "concluida" ? `Concluída em ${fmtDate(sel.dataConclusao)}.` : "Aguardando o conferente registrar a conferência física."}
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Aba 4 — Indicadores
+// ---------------------------------------------------------------------------
+const PIE_COLORS = { A: PRIORITY.A.ring, B: PRIORITY.B.ring, C: PRIORITY.C.ring };
+
+const SITUACAO_SHORT = {
+  "Material encontrado no endereço correto": "Endereço correto",
+  "Material encontrado em outro endereço": "Outro endereço",
+  "Material encontrado parcialmente": "Parcial",
+  "Material não localizado": "Não localizado",
+  "Material diferente do esperado": "Diferente do esperado",
+  "Quantidade física diferente da quantidade do sistema": "Qtd. diferente",
+  "Material sem identificação": "Sem identificação",
+  "Outra situação": "Outra situação",
+};
+
+function TelaIndicadores({ pendencias, goTo }) {
+  const concluidas = pendencias.filter((p) => p.status === "concluida");
+
+  const kpis = useMemo(() => {
+    const total = pendencias.length;
+    const confirmadas = concluidas.length;
+    const tempos = concluidas.map((p) => daysBetween(p.dataAbertura, p.dataConclusao)).filter((d) => d != null);
+    const tempoMedio = tempos.length ? (tempos.reduce((a, b) => a + b, 0) / tempos.length).toFixed(1) : "—";
+    const valorTotal = concluidas.reduce((a, p) => a + (Number(p.valorFinalDivergencia) || 0), 0);
+    return { total, concluidasCount: confirmadas, tempoMedio, valorTotal };
+  }, [pendencias, concluidas]);
+
+  // Total x Concluídas, agrupado por situação encontrada pelo conferente
+  const porSituacao = useMemo(() => {
+    return Object.keys(SITUACAO_SHORT)
+      .map((s) => {
+        const total = pendencias.filter((p) => p.situacaoEncontrada === s).length;
+        const concl = pendencias.filter((p) => p.situacaoEncontrada === s && p.status === "concluida").length;
+        return { name: SITUACAO_SHORT[s], total, concluidas: concl };
+      })
+      .filter((x) => x.total > 0);
+  }, [pendencias]);
+
+  // Prioridade considera TODAS as pendências, não só as concluídas
+  const porPrioridade = useMemo(() => {
+    const m = { A: 0, B: 0, C: 0 };
+    pendencias.forEach((p) => { m[p.prioridade] = (m[p.prioridade] || 0) + 1; });
+    return Object.entries(m).map(([name, value]) => ({ name: `${name} - ${PRIORITY[name].label}`, key: name, value }));
+  }, [pendencias]);
+
+  const porCausa = useMemo(() => {
+    const m = {};
+    concluidas.forEach((p) => { if (p.causaRaiz) m[p.causaRaiz] = (m[p.causaRaiz] || 0) + 1; });
+    return Object.entries(m).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
+  }, [concluidas]);
+
+  const evolucao = useMemo(() => {
+    const m = {};
+    pendencias.forEach((p) => {
+      const mk = p.dataAbertura?.slice(0, 7);
+      if (!mk) return;
+      m[mk] = m[mk] || { mes: mk, abertas: 0, concluidas: 0 };
+      m[mk].abertas += 1;
+    });
+    concluidas.forEach((p) => {
+      const mk = p.dataConclusao?.slice(0, 7);
+      if (!mk) return;
+      m[mk] = m[mk] || { mes: mk, abertas: 0, concluidas: 0 };
+      m[mk].concluidas += 1;
+    });
+    return Object.values(m).sort((a, b) => a.mes.localeCompare(b.mes));
+  }, [pendencias, concluidas]);
+
+  const hasData = pendencias.length > 0;
+
+  return (
+    <div>
+      <button onClick={() => goTo("menu")} className="flex items-center gap-1 text-sm font-semibold mb-3" style={{ color: ACCENT }}><ArrowLeft size={15} /> Voltar</button>
+      <h1 className="text-xl sm:text-2xl font-bold mb-1" style={{ color: TEXT }}>Indicadores de Inventário</h1>
+      <p className="text-sm mb-6" style={{ color: MUTED }}>
+        A prioridade considera todas as pendências cadastradas; os demais indicadores (causa raiz, tempo e valor) consideram as pendências já concluídas.
+      </p>
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
+        <KpiCard label="Total de Pendências" value={kpis.total} />
+        <KpiCard label="Divergências Concluídas" value={`${kpis.concluidasCount} de ${kpis.total}`} />
+        <KpiCard label="Tempo Médio de Resolução" value={kpis.tempoMedio === "—" ? "—" : `${kpis.tempoMedio} dias`} />
+        <KpiCard label="Valor Total de Divergências" value={fmtMoney(kpis.valorTotal)} />
+      </div>
+
+      {!hasData ? (
+        <div className="rounded-xl p-8 text-center" style={{ background: "#fff", border: `1px solid ${BORDER}`, color: MUTED }}>
+          Ainda não há pendências cadastradas. Os gráficos aparecem aqui assim que a primeira pendência for criada.
+        </div>
+      ) : (
+        <div className="grid md:grid-cols-2 gap-4 sm:gap-6">
+          <div className="rounded-xl p-3 sm:p-4" style={{ background: "#fff", border: `1px solid ${BORDER}` }}>
+            <p className="font-bold text-center mb-2 text-sm sm:text-base" style={{ color: NAVY }}>Pendências por Situação Encontrada — Total x Concluídas</p>
+            {porSituacao.length === 0 ? (
+              <p className="text-center text-sm py-16" style={{ color: MUTED }}>Nenhuma situação registrada ainda pelo conferente.</p>
+            ) : (
+              <ResponsiveContainer width="100%" height={280}>
+                <BarChart data={porSituacao} margin={{ bottom: 40 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#EEE" />
+                  <XAxis dataKey="name" tick={{ fontSize: 10 }} interval={0} angle={-25} textAnchor="end" height={70} />
+                  <YAxis allowDecimals={false} />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="total" name="Total de Pendências" fill={ACCENT} radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="concluidas" name="Concluídas" fill="#548235" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
+          </div>
+
+          <div className="rounded-xl p-3 sm:p-4" style={{ background: "#fff", border: `1px solid ${BORDER}` }}>
+            <p className="font-bold text-center mb-2 text-sm sm:text-base" style={{ color: NAVY }}>Pendências por Prioridade (todas)</p>
+            <ResponsiveContainer width="100%" height={280}>
+              <PieChart>
+                <Pie data={porPrioridade} dataKey="value" nameKey="name" innerRadius={55} outerRadius={90} label>
+                  {porPrioridade.map((e) => <Cell key={e.key} fill={PIE_COLORS[e.key]} />)}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+
+          <div className="rounded-xl p-3 sm:p-4" style={{ background: "#fff", border: `1px solid ${BORDER}` }}>
+            <p className="font-bold text-center mb-2 text-sm sm:text-base" style={{ color: NAVY }}>Pendências Concluídas por Causa Raiz</p>
+            {porCausa.length === 0 ? (
+              <p className="text-center text-sm py-16" style={{ color: MUTED }}>Nenhuma pendência concluída ainda.</p>
+            ) : (
+              <ResponsiveContainer width="100%" height={280}>
+                <BarChart data={porCausa} layout="vertical" margin={{ left: 40 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#EEE" />
+                  <XAxis type="number" allowDecimals={false} />
+                  <YAxis type="category" dataKey="name" tick={{ fontSize: 11 }} width={140} />
+                  <Tooltip />
+                  <Bar dataKey="value" fill="#ED7D31" radius={[0, 4, 4, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
+          </div>
+
+          <div className="rounded-xl p-3 sm:p-4" style={{ background: "#fff", border: `1px solid ${BORDER}` }}>
+            <p className="font-bold text-center mb-2 text-sm sm:text-base" style={{ color: NAVY }}>Evolução Mensal — Abertas x Concluídas</p>
+            <ResponsiveContainer width="100%" height={280}>
+              <LineChart data={evolucao}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#EEE" />
+                <XAxis dataKey="mes" tick={{ fontSize: 11 }} />
+                <YAxis allowDecimals={false} />
+                <Tooltip />
+                <Legend />
+                <Line type="monotone" dataKey="abertas" stroke="#C0504D" strokeWidth={2} name="Abertas" />
+                <Line type="monotone" dataKey="concluidas" stroke="#548235" strokeWidth={2} name="Concluídas" />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// App shell
+// ---------------------------------------------------------------------------
+export default function InventarioApp() {
+  const [pendencias, setPendencias] = useState(seedData);
+  const [tab, setTab] = useState("splash");
+  const [selectedId, setSelectedId] = useState(null);
+  const [perfil, setPerfil] = useState(null);
+
+  function update(id, patch) {
+    setPendencias((list) => list.map((p) => (p.id === id ? { ...p, ...patch } : p)));
+  }
+  function create(novo) {
+    setPendencias((list) => [novo, ...list]);
+  }
+  // Navegação genérica — usada quando a própria tela já cuidou de selecionar
+  // (ou não) uma pendência específica (ex.: "Acessar", "Reabrir p/ Conferente").
+  // Sempre passa pelo controle de acesso do perfil atual.
+  function goTo(t) {
+    setTab(podeAcessar(perfil, t) ? t : "menu");
+  }
+  function selecionar(id) { setSelectedId(id); }
+  // Navegação a partir do menu principal: sempre entra "limpa", sem nenhuma
+  // pendência pré-selecionada de uma sessão anterior.
+  function abrirDoMenu(key) {
+    setSelectedId(null);
+    setTab(podeAcessar(perfil, key) ? key : "menu");
+  }
+  function escolherPerfil(key) {
+    setPerfil(key);
+    setSelectedId(null);
+    setTab("menu");
+  }
+  function trocarPerfil() {
+    setPerfil(null);
+    setSelectedId(null);
+    setTab("splash");
+  }
+
+  const noHeader = tab === "splash";
+
+  return (
+    <div className="min-h-screen w-full" style={{ background: BG, fontFamily: "Inter, system-ui, sans-serif" }}>
+      {!noHeader && (
+        <header style={{ background: NAVY }} className="px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
+          <button className="flex items-center gap-3 min-w-0" onClick={() => abrirDoMenu("menu")} title="Voltar ao menu">
+            <img src={LOGO_URL} alt="VIX — 55 anos" className="shrink-0" style={{ height: 42, width: "auto" }} />
+            <h1 className="text-white font-bold text-base sm:text-lg truncate">Gestão de Pendências - Inventário</h1>
+          </button>
+          <div className="flex items-center gap-3 shrink-0">
+            {perfil && (
+              <span className="text-xs sm:text-sm hidden sm:inline" style={{ color: "#D8DFC0" }}>{PERFIS[perfil].label}</span>
+            )}
+            <button
+              onClick={trocarPerfil}
+              className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs sm:text-sm font-semibold"
+              style={{ color: "#fff", background: "rgba(255,255,255,0.12)" }}
+              title="Trocar perfil"
+            >
+              <LogOut size={14} /> <span className="hidden sm:inline">Trocar perfil</span>
+            </button>
+          </div>
+        </header>
+      )}
+
+      <main className="max-w-6xl mx-auto p-4 sm:p-6">
+        {tab === "splash" && <TelaSplash onSelect={escolherPerfil} />}
+        {tab === "menu" && <TelaMenu pendencias={pendencias} goTo={abrirDoMenu} perfil={perfil} />}
+        {tab === "cadastro" && podeAcessar(perfil, "cadastro") && <TelaCadastro onCreate={create} goTo={goTo} />}
+        {tab === "pendencias" && podeAcessar(perfil, "pendencias") && (
+          <TelaPendencias pendencias={pendencias} update={update} goTo={goTo} selecionar={selecionar} initialId={selectedId} perfil={perfil} />
+        )}
+        {tab === "analise" && podeAcessar(perfil, "analise") && (
+          <TelaAnaliseFinal pendencias={pendencias} update={update} goTo={goTo} selecionar={selecionar} initialId={selectedId} />
+        )}
+        {tab === "indicadores" && podeAcessar(perfil, "indicadores") && <TelaIndicadores pendencias={pendencias} goTo={goTo} />}
+      </main>
+    </div>
+  );
+}
